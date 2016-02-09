@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+//Describes a Person object
 class Person{
 	
 	String Full_Name;
@@ -17,17 +18,21 @@ class Person{
 	String Position_Title;
 	LocalDate Date_First_Hired;
 	
-	public Person(String Full_Name,
-	String Current_Annual_Salary,
-	String Gross_Pay_Received,
-	String Overtime_Pay,
-	String Department,
-	String Division,
-	String Assignment_Category,
-	String Position_Title,
-	String Date_First_Hired){
+	//constructor for Person
+	public Person(
+			String Full_Name,
+			String Current_Annual_Salary,
+			String Gross_Pay_Received,
+			String Overtime_Pay,
+			String Department,
+			String Division,
+			String Assignment_Category,
+			String Position_Title,
+			String Date_First_Hired){
 		
 		this.Full_Name=Full_Name;
+		
+		//if the respective input string is empty, set the integer member to 0
 		if (!Current_Annual_Salary.equals("")){
 			this.Current_Annual_Salary = Integer.parseInt(Current_Annual_Salary);
 		}else {
@@ -56,8 +61,17 @@ class Person{
 		
 	}
 	
+	//returns a string representation of the Person object
 	public String ToString(){
-		return "\""+Full_Name+"\",\""+Current_Annual_Salary+"\",\""+Gross_Pay_Received+"\",\""+Overtime_Pay+"\",\""+Department+"\",\""+Division+"\",\""+Assignment_Category+"\",\""+Position_Title+"\",\""+Date_First_Hired+"\"";
+		return "\""+Full_Name+"\",\""+
+				Current_Annual_Salary+"\",\""+
+				Gross_Pay_Received+"\",\""+
+				Overtime_Pay+"\",\""+
+				Department+"\",\""+
+				Division+"\",\""+
+				Assignment_Category+"\",\""+
+				Position_Title+"\",\""+
+				Date_First_Hired+"\"";
 	}
 	
 }
@@ -68,13 +82,15 @@ public class A2_Queries_NOSQL {
 		
 		String inPath = "IO\\employee-sample.csv";
 		BufferedReader reader = new BufferedReader(new FileReader(inPath));
-		reader.readLine();
-		String line = "";
+		reader.readLine(); //skip the first line
+		String line = ""; 
 		ArrayList<Person> people = new ArrayList<Person>();
-		
+
+		//read in the lines, split the values, create the Person objects, and put them into the ArrayList.
 		while ((line = reader.readLine()) != null) {
-			String[] values = line.split("\",\"");
-			Person p =new Person(values[0].substring(1,values[0].length()),
+			String[] values = line.split("\",\""); //have to split on "," instead of just comma, since some fields contain commas in the data
+			Person p =new Person(
+					values[0].substring(1,values[0].length()), //since we split on ",", we have to remove the leading and trailing quotes from the whole line
 					values[1],
 					values[2],
 					values[3],
@@ -83,16 +99,19 @@ public class A2_Queries_NOSQL {
 					values[6],
 					values[7],
 					values[8].substring(0,values[8].length() -1 ));
+			
 			people.add(p);
 		}
 		
 		reader.close();
 		
+		//run query 3
 		System.out.println("Query 3 Results:\n");
 		for(Person p : query3(people)){
 			System.out.println(p.ToString());
 		}
 		
+		//run query 4
 		System.out.println("\nQuery 4 Results:\n");
 		for(HashMap.Entry<String, Integer> entry : query4(people).entrySet()){
 			System.out.println("\""+entry.getKey()+"\",\""+entry.getValue()+"\"");
@@ -100,10 +119,12 @@ public class A2_Queries_NOSQL {
 		
 	}
 	
+	//Query 3, "List all people who work in the same department as "Adcock Sr Gerald W" - himself excluded"
 	public static ArrayList<Person> query3(ArrayList<Person> people){
 		String dept = "";
 		ArrayList<Person> resultSet = new ArrayList<Person>();
 		
+		//find the department of the first person whose name matches "Adcock Sr Gerald W"
 		for(Person p : people){
 			if(p.Full_Name.equals("Adcock Sr Gerald W")){
 				dept = p.Department;
@@ -111,6 +132,7 @@ public class A2_Queries_NOSQL {
 			}
 		}
 		
+		//find all the people whose department matches the found department from above
 		for(Person p : people){
 			if(p.Department.equals(dept) && !p.Full_Name.equals("Adcock Sr Gerald W")){
 				resultSet.add(p);
@@ -119,10 +141,12 @@ public class A2_Queries_NOSQL {
 		
 		return resultSet;
 	}
-
+	
+	//Query 4: "List all the departments and total number of employees working in that department"
 	public static HashMap<String, Integer> query4(ArrayList<Person> people){
 		HashMap<String, Integer> resultSet = new HashMap<String, Integer>();
 		
+		//use a hashMap to keep track of the number of people in each department, adding new departments when encountered
 		for(Person p: people){
 			if(resultSet.containsKey(p.Department)){
 				resultSet.put(p.Department, resultSet.get(p.Department) + 1);
@@ -134,25 +158,3 @@ public class A2_Queries_NOSQL {
 		return resultSet;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
